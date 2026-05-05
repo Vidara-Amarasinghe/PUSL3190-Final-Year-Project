@@ -1,0 +1,16 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# ML model binaries (too large, generated files)
+*.pkl
+
+# Database (generated at runtime)
+*.db
+
+# Logs (generated at runtime)
+*.log
+
+# Environment
+.env
+venv/
