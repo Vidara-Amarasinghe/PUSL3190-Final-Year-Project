@@ -44,6 +44,12 @@ ALLOWLIST = [
     # Aliases
     'docs.mydns.test', 'help.mydns.test', 'support.mydns.test',
     'sip.mydns.test',
+
+    # Reverse DNS / PTR (automatically sent by Windows/Linux)
+    '10.56.168.192.in-addr.arpa',
+    '1.0.0.127.in-addr.arpa',
+    'in-addr.arpa',
+]
 ]
 
 ALERT_FILE           = "/home/student/dns-anomaly/alerts.log"
