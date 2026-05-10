@@ -184,7 +184,10 @@ def load_alerts(limit=9999999):
     try:
         conn = sqlite3.connect(DB_FILE)
         df = pd.read_sql_query(
-            f'SELECT * FROM alerts ORDER BY id DESC LIMIT {limit}', conn)
+            f"""SELECT * FROM alerts
+                WHERE domain NOT LIKE '%in-addr.arpa%'
+                AND domain NOT LIKE '%ip6.arpa%'
+                ORDER BY id DESC LIMIT {limit}""", conn)
         conn.close()
         return df
     except:

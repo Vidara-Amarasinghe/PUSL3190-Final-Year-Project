@@ -50,7 +50,6 @@ ALLOWLIST = [
     '1.0.0.127.in-addr.arpa',
     'in-addr.arpa',
 ]
-]
 
 ALERT_FILE           = "/home/student/dns-anomaly/alerts.log"
 WINDOW_SECONDS       = 10
@@ -103,7 +102,22 @@ def get_severity(reason, value):
     return "Low"
 
 # ─── Alert Writer ─────────────────────────────────────────
+# ── Alert deduplication cache ──
+_alert_cache = {}
+DEDUP_SECONDS = 30
+
 def write_alert(reason, ip, domain, extra="", value=0):
+    # Skip PTR and reverse DNS lookups
+    if 'in-addr.arpa' in domain or 'ip6.arpa' in domain:
+        return
+    # Deduplication — skip if same ip+domain+reason within 30s
+    cache_key = f"{ip}:{domain}:{reason}"
+    now_ts = time.time()
+    if cache_key in _alert_cache:
+        if now_ts - _alert_cache[cache_key] < DEDUP_SECONDS:
+            return
+    _alert_cache[cache_key] = now_ts
+
     severity = get_severity(reason, value)
     ts = now_utc()
     msg = (f"[{ts}] ALERT | {severity} | {reason} | "
