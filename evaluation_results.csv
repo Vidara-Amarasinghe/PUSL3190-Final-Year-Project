@@ -1,15 +1,15 @@
 Metric,Value
-Total Events,59
-Normal Queries,14
-Attack Queries,45
-Accuracy,98.31%
-Detection Rate,97.78%
+Total Events,54
+Normal Queries,17
+Attack Queries,37
+Accuracy,98.15%
+Detection Rate,97.3%
 Precision,100.0%
-Recall,97.78%
-F1 Score,98.88%
+Recall,97.3%
+F1 Score,98.63%
 False Positive Rate,0.0%
-False Negative Rate,2.22%
-True Positives,44
-True Negatives,14
+False Negative Rate,2.7%
+True Positives,36
+True Negatives,17
 False Positives,0
 False Negatives,1

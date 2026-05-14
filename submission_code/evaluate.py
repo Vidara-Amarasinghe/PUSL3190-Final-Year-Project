@@ -39,28 +39,8 @@ print("\n[2/6] Creating ground truth labels...")
 
 # Known legitimate domains
 KNOWN_LEGITIMATE = [
-    'mydns.test', 'ns1.mydns.test', 'ns2.mydns.test',
-    'www.mydns.test', 'web.mydns.test', 'http.mydns.test',
-    'mail.mydns.test', 'smtp.mydns.test', 'pop.mydns.test',
-    'pop3.mydns.test', 'imap.mydns.test', 'webmail.mydns.test',
-    'ftp.mydns.test', 'sftp.mydns.test', 'vpn.mydns.test',
-    'remote.mydns.test', 'rdp.mydns.test',
-    'api.mydns.test', 'app.mydns.test', 'portal.mydns.test',
-    'gateway.mydns.test',
-    'dev.mydns.test', 'test.mydns.test', 'staging.mydns.test',
-    'uat.mydns.test', 'qa.mydns.test',
-    'db.mydns.test', 'database.mydns.test',
-    'mysql.mydns.test', 'postgres.mydns.test',
-    'admin.mydns.test', 'monitor.mydns.test', 'backup.mydns.test',
-    'storage.mydns.test', 'ntp.mydns.test', 'proxy.mydns.test',
-    'firewall.mydns.test', 'router.mydns.test',
-    'shop.mydns.test', 'store.mydns.test', 'blog.mydns.test',
-    'news.mydns.test', 'media.mydns.test', 'cdn.mydns.test',
-    'static.mydns.test',
-    'auth.mydns.test', 'login.mydns.test', 'sso.mydns.test',
-    'ldap.mydns.test',
-    'docs.mydns.test', 'help.mydns.test', 'support.mydns.test',
-    'sip.mydns.test',
+    'www.mydns.test', 'mydns.test',
+    'mail.mydns.test', 'ns1.mydns.test'
 ]
 
 # Get domains that triggered alerts
