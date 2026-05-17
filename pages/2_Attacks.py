@@ -207,7 +207,7 @@ def get_real_counts():
         res_c = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM alerts WHERE status='False Positive'")
         fp_c = cursor.fetchone()[0]
-        cursor.execute("SELECT COUNT(*) FROM alerts WHERE severity='High'")
+        cursor.execute("SELECT COUNT(*) FROM alerts WHERE severity IN ('High','CRITICAL')")
         high_c = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM alerts WHERE severity='Medium'")
         med_c = cursor.fetchone()[0]
@@ -371,7 +371,7 @@ def render_alert_card(alert):
             with b1:
                 if st.button("Investigate",
                             key=f"inv_{alert['id']}",
-                            use_container_width=True):
+                            width="stretch"):
                     update_alert_status(alert['id'], 'Investigating')
                     st.success("Moved to Investigating!")
                     time.sleep(1)
@@ -379,7 +379,7 @@ def render_alert_card(alert):
             with b2:
                 if st.button("Resolve",
                             key=f"res_{alert['id']}",
-                            use_container_width=True):
+                            width="stretch"):
                     update_alert_status(alert['id'], 'Resolved')
                     st.success("Moved to Closed!")
                     time.sleep(1)
@@ -388,7 +388,7 @@ def render_alert_card(alert):
             with b3:
                 if st.button("False Positive",
                             key=f"fp_{alert['id']}",
-                            use_container_width=True):
+                            width="stretch"):
                     update_alert_status(alert['id'], 'False Positive')
                     st.warning("Moved to Closed!")
                     time.sleep(1)
@@ -396,7 +396,7 @@ def render_alert_card(alert):
             with b4:
                 if st.button("Block IP",
                             key=f"blk_{alert['id']}",
-                            use_container_width=True):
+                            width="stretch"):
                     if block_ip(alert['client_ip']):
                         update_alert_status(alert['id'], 'Resolved')
                         st.error(f"IP {alert['client_ip']} BLOCKED!")
@@ -454,7 +454,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Mark All Investigating", use_container_width=True):
+    if st.button("Mark All Investigating", width="stretch"):
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         cursor.execute("UPDATE alerts SET status='Investigating' WHERE status='Open'")
@@ -464,7 +464,7 @@ with st.sidebar:
         time.sleep(1)
         st.rerun()
 
-    if st.button("Mark All Resolved", use_container_width=True):
+    if st.button("Mark All Resolved", width="stretch"):
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         cursor.execute("UPDATE alerts SET status='Resolved' WHERE status='Open'")
@@ -474,7 +474,7 @@ with st.sidebar:
         time.sleep(1)
         st.rerun()
 
-    if st.button("Mark All False Positive", use_container_width=True):
+    if st.button("Mark All False Positive", width="stretch"):
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         cursor.execute("UPDATE alerts SET status='False Positive' WHERE status='Open'")
@@ -557,7 +557,7 @@ st.markdown("""
 fc1, fc2, fc3 = st.columns(3)
 with fc1:
     filter_severity = st.selectbox("Severity",
-        ["All", "High", "Medium", "Low"])
+        ["All", "Critical", "High", "Medium", "Low"])
 with fc2:
     filter_reason = st.selectbox("Attack Type",
         ["All", "HIGH_ENTROPY", "HIGH_QUERY_RATE",
@@ -567,9 +567,9 @@ with fc3:
         ["All", "Open", "Investigating", "Resolved", "False Positive"],
         index=0)
 
-filtered_df = display_df.copy()
+filtered_df = all_alerts_df.copy()
 if quick_filter == "Open Only":
-    filtered_df = filtered_df[filtered_df['status'] == 'Open']
+    filtered_df = filtered_df[filtered_df['status'].isin(['Open','NEW'])]
 elif quick_filter == "High Severity":
     filtered_df = filtered_df[filtered_df['severity'] == 'High']
 if filter_severity != "All":
@@ -590,7 +590,7 @@ st.markdown("""
 if filtered_df.empty:
     st.info("No alerts match the current filter.")
 else:
-    open_df = filtered_df[filtered_df['status'] == 'Open']
+    open_df = filtered_df[filtered_df['status'].isin(['Open','NEW'])]
     inv_df  = filtered_df[filtered_df['status'] == 'Investigating']
     res_df  = filtered_df[filtered_df['status'] == 'Resolved']
     fp_df   = filtered_df[filtered_df['status'] == 'False Positive']
@@ -632,7 +632,7 @@ else:
     """, unsafe_allow_html=True)
 
     if not res_df.empty:
-        with st.expander(f"Resolved  ({len(res_df)})", expanded=False):
+        with st.expander(f"Resolved  ({len(res_df)})", expanded=(filter_status == 'Resolved')):
             for _, alert in res_df.iterrows():
                 render_alert_card(alert)
     else:
@@ -643,7 +643,7 @@ else:
         """, unsafe_allow_html=True)
 
     if not fp_df.empty:
-        with st.expander(f"False Positives  ({len(fp_df)})", expanded=False):
+        with st.expander(f"False Positives  ({len(fp_df)})", expanded=(filter_status == 'False Positive')):
             for _, alert in fp_df.iterrows():
                 render_alert_card(alert)
 
@@ -668,7 +668,7 @@ if blocked:
         """, unsafe_allow_html=True)
         with bc2:
             if st.button("Unblock", key=f"unb_{ip}",
-                        use_container_width=True):
+                        width="stretch"):
                 unblock_ip(ip)
                 st.success(f"{ip} unblocked!")
                 time.sleep(1)
@@ -717,7 +717,7 @@ with ac1:
             xaxis=dict(gridcolor='#1e2230', title=''),
             yaxis=dict(gridcolor='#1e2230', title='Count'))
         fig.update_traces(marker_line_width=0)
-        st.plotly_chart(fig, use_container_width=True,
+        st.plotly_chart(fig, width="stretch",
                        config={'displayModeBar': False})
 
 with ac2:
@@ -743,7 +743,7 @@ with ac2:
             font_color='#94a3b8',
             font_family='Inter',
             margin=dict(t=10, b=10, l=10, r=10))
-        st.plotly_chart(fig, use_container_width=True,
+        st.plotly_chart(fig, width="stretch",
                        config={'displayModeBar': False})
 
 st.divider()

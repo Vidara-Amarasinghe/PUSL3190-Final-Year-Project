@@ -262,7 +262,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
     c1, c2 = st.columns(2)
-    if c1.button("Start", use_container_width=True):
+    if c1.button("Start", width="stretch"):
         if not is_detector_running():
             subprocess.Popen(
                 ['sudo', 'python3', DETECTOR],
@@ -270,13 +270,13 @@ with st.sidebar:
                 stderr=subprocess.DEVNULL)
             time.sleep(2)
             st.rerun()
-    if c2.button("Stop", use_container_width=True):
+    if c2.button("Stop", width="stretch"):
         subprocess.run(['sudo', 'pkill', '-f', 'detector.py'])
         time.sleep(1)
         st.rerun()
 
     st.divider()
-    if st.button("Clear All Data", use_container_width=True):
+    if st.button("Clear All Data", width="stretch"):
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
         cursor.execute('DELETE FROM dns_events')
@@ -490,7 +490,7 @@ if not events_df.empty:
                             'query_type', 'entropy',
                             'Entropy Level', 'query_count',
                             'Status']].style.apply(color_rows, axis=1)
-    st.dataframe(styled_df, use_container_width=True, height=280)
+    st.dataframe(styled_df, width="stretch", height=280)
 else:
     st.markdown("""
     <div style='background:#161923; border:1px solid #1e2230;
@@ -540,7 +540,7 @@ with ch1:
             xaxis=dict(gridcolor='#1e2230', title=''),
             yaxis=dict(gridcolor='#1e2230', title='Count'))
         fig.update_traces(marker_line_width=0)
-        st.plotly_chart(fig, use_container_width=True,
+        st.plotly_chart(fig, width="stretch",
                        config={'displayModeBar': False})
     else:
         st.info("No alerts yet.")
@@ -571,7 +571,7 @@ with ch2:
             xaxis=dict(gridcolor='#1e2230'),
             yaxis=dict(gridcolor='#1e2230'))
         fig.update_traces(marker_line_width=0)
-        st.plotly_chart(fig, use_container_width=True,
+        st.plotly_chart(fig, width="stretch",
                        config={'displayModeBar': False})
     else:
         st.info("No events yet.")
@@ -593,7 +593,7 @@ if not alerts_df.empty:
     st.dataframe(
         alerts_df[['timestamp', 'client_ip', 'domain',
                    'reason', 'severity', 'status']],
-        use_container_width=True, height=250)
+        width="stretch", height=250)
     csv = alerts_df.to_csv(index=False)
     st.download_button(
         "Export Alerts as CSV",

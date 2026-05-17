@@ -259,7 +259,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     st.divider()
-    if st.button("Re-run Evaluation", use_container_width=True):
+    if st.button("Re-run Evaluation", width="stretch"):
         st.cache_data.clear()
         st.rerun()
 
@@ -372,7 +372,7 @@ with ch1:
         font_color='#94a3b8',
         font_family='Inter',
         margin=dict(t=10, b=10, l=10, r=10))
-    st.plotly_chart(fig, use_container_width=True,
+    st.plotly_chart(fig, width="stretch",
                    config={'displayModeBar': False})
 
 with ch2:
@@ -408,66 +408,9 @@ with ch2:
         yaxis=dict(gridcolor='#1e2230'),
         legend=dict(bgcolor='rgba(0,0,0,0)'))
     fig.update_traces(marker_line_width=0)
-    st.plotly_chart(fig, use_container_width=True,
+    st.plotly_chart(fig, width="stretch",
                    config={'displayModeBar': False})
 
-ch3, ch4 = st.columns(2)
-
-with ch3:
-    st.markdown("""
-    <div style='font-size:13px; font-weight:600;
-                color:#94a3b8; margin-bottom:8px;'>
-        Anomaly Score Distribution
-    </div>
-    """, unsafe_allow_html=True)
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(
-        x=results['normal_scores'], name='Normal',
-        marker_color='#16a34a', opacity=0.7, nbinsx=20))
-    fig.add_trace(go.Histogram(
-        x=results['attack_scores'], name='Attack',
-        marker_color='#dc2626', opacity=0.7, nbinsx=20))
-    fig.update_layout(
-        barmode='overlay',
-        xaxis_title='Anomaly Score', yaxis_title='Count',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#94a3b8', font_family='Inter',
-        margin=dict(t=10, b=10, l=10, r=10),
-        xaxis=dict(gridcolor='#1e2230'),
-        yaxis=dict(gridcolor='#1e2230'),
-        legend=dict(bgcolor='rgba(0,0,0,0)'))
-    st.plotly_chart(fig, use_container_width=True,
-                   config={'displayModeBar': False})
-
-with ch4:
-    st.markdown("""
-    <div style='font-size:13px; font-weight:600;
-                color:#94a3b8; margin-bottom:8px;'>
-        TP / TN / FP / FN Breakdown
-    </div>
-    """, unsafe_allow_html=True)
-    breakdown = pd.DataFrame({
-        'Category': ['True Positive', 'True Negative',
-                     'False Positive', 'False Negative'],
-        'Count':    [results['tp'], results['tn'],
-                     results['fp'], results['fn']],
-        'Color':    ['good', 'good', 'bad', 'bad']
-    })
-    fig = px.bar(breakdown, x='Category', y='Count',
-        color='Color',
-        color_discrete_map={'good': '#16a34a', 'bad': '#dc2626'})
-    fig.update_layout(
-        showlegend=False,
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#94a3b8', font_family='Inter',
-        margin=dict(t=10, b=10, l=10, r=10),
-        xaxis=dict(gridcolor='#1e2230'),
-        yaxis=dict(gridcolor='#1e2230'))
-    fig.update_traces(marker_line_width=0)
-    st.plotly_chart(fig, use_container_width=True,
-                   config={'displayModeBar': False})
 
 st.markdown("<br>", unsafe_allow_html=True)
 

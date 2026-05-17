@@ -157,9 +157,9 @@ def analyze_log(content):
     df['query_count'] = df['client_ip'].map(ip_counts)
     df[['Classification', 'Reason']] = df.apply(
         lambda row: pd.Series(classify_query(row)), axis=1)
-    df.loc[df['query_count'] >= 100, 'Classification'] = 'Suspicious'
-    df.loc[df['query_count'] >= 100, 'Reason'] = \
-        df.loc[df['query_count'] >= 20, 'Reason'] + ', HIGH_QUERY_RATE'
+    high_rate = (df['query_count'] >= 100) & (~df['domain'].isin(KNOWN_LEGIT_LOG))
+    df.loc[high_rate, 'Classification'] = 'Suspicious'
+    df.loc[high_rate, 'Reason'] = df.loc[high_rate, 'Reason'].astype(str) + ', HIGH_QUERY_RATE'
     return df
 
 # ── Sidebar ──
@@ -274,7 +274,7 @@ col1, col2 = st.columns([2, 5])
 with col1:
     analyze_live = st.button(
         "Analyze Current /var/log/syslog",
-        use_container_width=True)
+        width="stretch")
 
 if analyze_live:
     try:
@@ -371,7 +371,7 @@ if content:
                 font_color='#94a3b8',
                 font_family='Inter',
                 margin=dict(t=10, b=10, l=10, r=10))
-            st.plotly_chart(fig, use_container_width=True,
+            st.plotly_chart(fig, width="stretch",
                            config={'displayModeBar': False})
 
         with col2:
@@ -399,68 +399,10 @@ if content:
                 xaxis=dict(gridcolor='#1e2230'),
                 yaxis=dict(gridcolor='#1e2230'))
             fig.update_traces(marker_line_width=0)
-            st.plotly_chart(fig, use_container_width=True,
+            st.plotly_chart(fig, width="stretch",
                            config={'displayModeBar': False})
 
-        col3, col4 = st.columns(2)
-        with col3:
-            st.markdown("""
-            <div style='font-size:13px; font-weight:600;
-                        color:#94a3b8; margin-bottom:8px;'>
-                Top Source IPs
-            </div>
-            """, unsafe_allow_html=True)
-            top_ips = df['client_ip'].value_counts().head(10).reset_index()
-            top_ips.columns = ['IP', 'Queries']
-            fig = px.bar(top_ips, x='Queries', y='IP',
-                orientation='h',
-                color_discrete_sequence=['#7c3aed'])
-            fig.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font_color='#94a3b8',
-                font_family='Inter',
-                margin=dict(t=10, b=10, l=10, r=10),
-                xaxis=dict(gridcolor='#1e2230'),
-                yaxis=dict(gridcolor='#1e2230'))
-            fig.update_traces(marker_line_width=0)
-            st.plotly_chart(fig, use_container_width=True,
-                           config={'displayModeBar': False})
 
-        with col4:
-            st.markdown("""
-            <div style='font-size:13px; font-weight:600;
-                        color:#94a3b8; margin-bottom:8px;'>
-                Detection Reasons
-            </div>
-            """, unsafe_allow_html=True)
-            sus_df = df[df['Classification'] == 'Suspicious']
-            if not sus_df.empty:
-                reasons = []
-                for r in sus_df['Reason']:
-                    reasons.extend(r.split(', '))
-                rc = pd.DataFrame(
-                    Counter(reasons).items(),
-                    columns=['Reason', 'Count'])
-                fig = px.bar(rc, x='Reason', y='Count',
-                    color_discrete_sequence=['#dc2626'])
-                fig.update_layout(
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    font_color='#94a3b8',
-                    font_family='Inter',
-                    margin=dict(t=10, b=10, l=10, r=10),
-                    xaxis=dict(gridcolor='#1e2230'),
-                    yaxis=dict(gridcolor='#1e2230'))
-                fig.update_traces(marker_line_width=0)
-                st.plotly_chart(fig, use_container_width=True,
-                               config={'displayModeBar': False})
-            else:
-                st.markdown("""
-                <div class='result-clean'>
-                    No suspicious queries found
-                </div>
-                """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -474,7 +416,7 @@ if content:
                 sus_df[['client_ip', 'domain', 'query_type',
                         'entropy', 'depth', 'length',
                         'query_count', 'Reason']],
-                use_container_width=True, height=300)
+                width="stretch", height=300)
             csv = sus_df.to_csv(index=False)
             st.download_button(
                 "Export Suspicious Queries CSV",
@@ -495,7 +437,7 @@ if content:
                 df[['client_ip', 'domain', 'query_type',
                     'entropy', 'depth', 'length',
                     'query_count', 'Classification', 'Reason']],
-                use_container_width=True, height=400)
+                width="stretch", height=400)
             csv_all = df.to_csv(index=False)
             st.download_button(
                 "Export All Queries CSV",
