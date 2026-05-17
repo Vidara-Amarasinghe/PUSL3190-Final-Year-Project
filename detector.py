@@ -97,6 +97,10 @@ def get_severity(reason, value):
             return "High"
         else:
             return "Medium"
+    elif reason == "ML_ANOMALY":
+        return "Medium"
+    elif reason == "ADAPTIVE_ANOMALY":
+        return "Medium"
     elif reason == "DEEP_SUBDOMAIN":
         return "Medium"
     return "Low"
@@ -205,7 +209,7 @@ def monitor():
                 write_alert("DEEP_SUBDOMAIN", client_ip, domain,
                            f"depth={depth}", depth)
 
-            if is_anomaly and ml_score < -0.63 and domain not in ALLOWLIST:
+            if ml_score < -0.55 and domain not in ALLOWLIST:
                 write_alert("ML_ANOMALY", client_ip, domain,
                            f"ml_score={ml_score}", abs(ml_score))
 
